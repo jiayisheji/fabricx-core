@@ -5,7 +5,7 @@
     "emitDeclarationOnly": true,
     "importHelpers": true,
     "isolatedModules": true,
-    "lib": ["es2022"],
+    "lib": ["es2022", "DOM"],
     "module": "nodenext",
     "moduleResolution": "nodenext",
     "noEmitOnError": true,
@@ -16,9 +16,10 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "es2022",
+    "baseUrl": ".",
     "customConditions": ["development"],
     "paths": {
-      "@fabricx-core/*": ["packages/*/src/index.ts"]
+      "@fabricx-core/editor": ["packages/core/src/index.ts"]
     }
   }
 }
