@@ -1,0 +1,69 @@
+name: CI Checks
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+
+permissions:
+  actions: read
+  contents: read
+  pull-requests: write
+
+jobs:
+  quality-checks:
+    name: Lint & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      # 步骤 1: 检出代码
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # 对于 'nx affected' 命令，需要获取比默认更深的历史记录来正确计算变更
+          # fetch-depth: 0 会获取所有历史记录
+          fetch-depth: 0
+
+      # 步骤 2: 安装 pnpm
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+
+      # 步骤 3: 设置 Node.js 环境
+      # 并启用 pnpm 的依赖缓存
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      # 步骤 4: 安装项目依赖
+      # 使用 --frozen-lockfile 确保 CI 使用与 lockfile 完全一致的依赖版本
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # 步骤 5: 运行代码风格检查
+      # 仅对受当前变更影响的项目运行 'lint' 任务
+      - name: Lint affected projects
+        run: pnpm exec nx affected -t lint --parallel
+
+      # 步骤 6: 运行单元测试并生成覆盖率报告
+      # 仅对受当前变更影响的项目运行 'test' 任务
+      # --coverage 是关键参数，用于指示 Vitest 生成覆盖率报告
+      - name: Test affected projects with coverage
+        run: pnpm exec nx affected -t test --parallel --coverage
+
+      # 步骤 7: 上传覆盖率报告到 Codecov
+      # 这一步依赖于上一步生成的覆盖率文件
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          # 从 GitHub Secrets 中获取 Codecov 的上传令牌
+          # 对于公共仓库，建议设置以提高上传的可靠性
+          token: ${{ secrets.CODECOV_TOKEN }}
+          # (可选) 如果上传失败，则让整个 CI 作业失败
+          fail_ci_if_error: true
