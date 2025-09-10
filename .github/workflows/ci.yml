@@ -26,6 +26,11 @@ jobs:
           # fetch-depth: 0 会获取所有历史记录
           fetch-depth: 0
 
+      - name: Ensure main branch is available
+        run: |
+          git fetch origin main:main
+          git branch --all
+
       # 步骤 2: 安装 pnpm
       - name: Install pnpm
         uses: pnpm/action-setup@v4
