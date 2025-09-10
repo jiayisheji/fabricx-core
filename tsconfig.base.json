@@ -17,7 +17,7 @@
     "strict": true,
     "target": "es2022",
     "baseUrl": ".",
-    "customConditions": ["development"],
+    "customConditions": ["@fabricx-core"],
     "paths": {
       "@fabricx-core/editor": ["packages/core/src/index.ts"]
     }
