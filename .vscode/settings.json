@@ -1,0 +1,21 @@
+{
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "eslint.workingDirectories": [
+    {
+      "pattern": "apps/*"
+    },
+    {
+      "pattern": "packages/*"
+    }
+  ],
+  "eslint.validate": ["javascript", "typescript"],
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "prettier.configPath": ".prettierrc",
+  "nxConsole.generateAiAgentRules": false,
+  "nxConsole.nxWorkspacePath": ""
+}

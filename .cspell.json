@@ -1,0 +1,41 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "commitlint",
+    "commitizen",
+    "husky",
+    "lintstaged",
+    "prettier",
+    "nodenext",
+    "eslint",
+    "fabricx",
+    "cz-config",
+    "pnpm",
+    "nx",
+    "swc",
+    "tsconfig",
+    "vite",
+    "vitest",
+    "verdaccio",
+    "yml",
+    "less",
+    "scss",
+    "mjs",
+    "cjs"
+  ],
+  "ignorePaths": [
+    "node_modules",
+    "dist",
+    "build",
+    "coverage",
+    ".git",
+    ".husky",
+    ".nx",
+    "*.svg",
+    "*.png",
+    "*.ico",
+    "*.lock",
+    "pnpm-lock.yaml"
+  ]
+}
