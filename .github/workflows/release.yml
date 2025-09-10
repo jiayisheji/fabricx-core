@@ -1,0 +1,89 @@
+name: Release and Deploy
+
+# 触发条件：只在代码被 push 到 main 分支时运行
+on:
+  push:
+    branches:
+      - main
+
+# 权限：需要写入权限来部署到 GitHub Pages 和发布包
+permissions:
+  contents: write # <<<< 需要 write 权限来推送 gh-pages 分支
+  pages: write # <<<< 需要 write 权限来部署 GitHub Pages
+  id-token: write # <<<< (可选) 如果使用 npm 的受信发布，则需要
+
+jobs:
+  release-and-deploy:
+    name: Build, Release & Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # 需要完整的历史记录来正确地进行版本管理和生成 changelog
+          fetch-depth: 0
+
+      - name: Setup Node.js and pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+          # <<<< 关键：配置 npm registry 和认证令牌 >>>>
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build all projects
+        # 在发布前，我们需要构建所有受影响的包
+        run: pnpm exec nx affected -t build --parallel
+
+      # =========================================================
+      # 方案 A: 使用第三方工具进行版本管理和发布 (推荐)
+      # 比如 `semantic-release` 或 `changesets`。这里以 `changesets` 为例，它与 Nx 配合得很好。
+      # 这个 action 会自动检测版本变化、发布 npm 包、创建 GitHub Release。
+      # =========================================================
+      - name: Create Release Pull Request or Publish to npm
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          # 命令 changesets-action 自动执行 version 和 publish
+          publish: pnpm exec nx release publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # <<<< 关键：需要在 GitHub secrets 中设置 NPM_TOKEN >>>>
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          # <<<< 告诉 Nx 不要进行交互式提问 >>>>
+          NX_NON_INTERACTIVE: true
+
+      # =========================================================
+      # VitePress 文档部署
+      # ---------------------------------------------------------
+      # 只有在 changesets 成功发布了新版本时才执行
+      # =========================================================
+      - name: Build documentation
+        if: steps.changesets.outputs.published == 'true'
+        env:
+          VITEPRESS_BASE: /fabricx-core/
+        run: pnpm run docs:build
+
+      - name: Setup Pages
+        if: steps.changesets.outputs.published == 'true'
+        uses: actions/configure-pages@v4
+
+      - name: Upload docs artifact
+        if: steps.changesets.outputs.published == 'true'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # VitePress 构建输出的目录
+          path: 'docs/.vitepress/dist'
+
+      - name: Deploy to GitHub Pages
+        if: steps.changesets.outputs.published == 'true'
+        id: deployment
+        uses: actions/deploy-pages@v4
