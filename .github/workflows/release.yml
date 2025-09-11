@@ -44,8 +44,7 @@ jobs:
         run: pnpm exec nx affected -t build --parallel
 
       # =========================================================
-      # 方案 A: 使用第三方工具进行版本管理和发布 (推荐)
-      # 比如 `semantic-release` 或 `changesets`。这里以 `changesets` 为例，它与 Nx 配合得很好。
+      # 方案 A: 使用第三方工具进行版本管理和发布 (推荐 changesets)
       # 这个 action 会自动检测版本变化、发布 npm 包、创建 GitHub Release。
       # =========================================================
       - name: Create Release Pull Request or Publish to npm

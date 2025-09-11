@@ -12,7 +12,7 @@
     "forceConsistentCasingInFileNames": true,
     "types": ["node", "vite/client"]
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "vite-env.d.ts"],
   "references": [],
   "exclude": [
     "vite.config.ts",

@@ -54,7 +54,7 @@ export default defineConfig(() => ({
       branches: 90,
       statements: 90,
       // Exclude files or directories that do not require statistics
-      exclude: ['node_modules', 'dist', 'test', '**/*.d.ts'],
+      exclude: ['node_modules', 'dist', 'test'],
       // Only count the files in the specified directory
       include: ['src/lib/**'],
       // Check the untested files
